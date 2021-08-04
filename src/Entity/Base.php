@@ -102,8 +102,8 @@ abstract class Base extends BaseDataType
     /**
      * Class constants
      */
-    public const DHL_REQ = 'http://www.dhl.com';
-    public const DHL_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
+    const DHL_REQ = 'http://www.dhl.com';
+    const DHL_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
 
     /**
      * Class constructor
@@ -217,12 +217,19 @@ abstract class Base extends BaseDataType
     {
         $xml = simplexml_load_string(str_replace('req:', '', $xml));
 
+
+        if ((string)$xml->Note->ActionNote != 'Success') {
+            $errorMsg = ((string)$xml->Note->Condition->ConditionCode) . ' : '
+                . ((string)$xml->Note->Condition->ConditionCode);
+            throw new \Exception('Error returned from DHL webservice : ' . $errorMsg);
+        }
+/*
         if ((string)$xml->Response->Status->Condition->ConditionCode != '') {
             $errorMsg = ((string)$xml->Response->Status->Condition->ConditionCode) . ' : '
                 . ((string)$xml->Response->Status->Condition->ConditionData);
             throw new \Exception('Error returned from DHL webservice : ' . $errorMsg);
         }
-
+*/
         $parts = explode('\\', get_class($this));
         $class_name = array_pop($parts);
         foreach ($xml->children() as $child) {
@@ -274,7 +281,7 @@ abstract class Base extends BaseDataType
      *
      * @return void
      */
-    protected function initializeValues(): void
+    protected function initializeValues()//: void
     {
         foreach ($this->params as $name => $infos) {
             if (!$this->is_sub_object && isset($infos['subobject']) && $infos['subobject']) {
@@ -303,7 +310,7 @@ abstract class Base extends BaseDataType
      * @return boolean True upon success
      * @throws InvalidArgumentException Throws exception if type not valid or if value are missing
      */
-    protected function validateParameters(): bool
+    protected function validateParameters()//: bool
     {
         foreach ($this->params as $name => $infos) {
             if (isset($infos['required']) && true === $infos['required'] && $this->values[$name] === null) {

@@ -129,7 +129,7 @@ abstract class Base
         $xml = simplexml_load_string(str_replace('req:', '', $xml));
         $parts = explode('\\', get_class($this));
         $className = array_pop($parts);
-        dd($className);
+        //var_dump($className);
         foreach ($xml->children() as $child) {
             $childName = $child->getName();
 
@@ -140,7 +140,7 @@ abstract class Base
                     $sub_child_name = $sub_child->getName();
                     $child_class_name = implode('\\', $parts) . '\\' . $this->params[$sub_child_name]['type'];
                     $child_class_name = str_replace('Entity', 'Datatype', $child_class_name);
-                    dd($child_class_name);
+                    //var_dump($child_class_name);
                     if ('string' == $this->params[$sub_child_name]['type']) {
                         $childObj = trim((string)$sub_child);
                     } else {
@@ -169,12 +169,10 @@ abstract class Base
     {
         $key = str_replace('add', '', $name);
 
-        if (
-            isset($this->params[$key . 's'])
+        if (isset($this->params[$key . 's'])
             && $this->params[$key . 's']['type'] !== 'string'
             && isset($this->params[$key . 's']['multivalues'])
-            && true === $this->params[$key . 's']['multivalues']
-        ) {
+            && true === $this->params[$key . 's']['multivalues']) {
             $key .= 's';
         }
 
@@ -309,11 +307,9 @@ abstract class Base
 
         switch ($this->params[$key]['type']) {
             case 'string':
-                if (
-                    is_array($value)
+                if (is_array($value)
                     && isset($this->params[$key]['multivalues'])
-                    && true === $this->params[$key]['multivalues']
-                ) {
+                    && true === $this->params[$key]['multivalues']) {
                     foreach ($value as $subvalue) {
                         if (null !== $subvalue && $subvalue !== (string)$subvalue) {
                             throw new \InvalidArgumentException('Invalid type for ' . $key . '. It should be of type : '
